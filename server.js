@@ -4,25 +4,23 @@ var requestHandlers = require("./requestHandler");
 
 
 var handle = {}
-handle["/"] = requestHandlers.start;
-handle["/start"] = requestHandlers.start;
-handle["/upload"] = requestHandlers.upload;
+handle["/"] = requestHandlers.index;
+handle["/BaseNotificationServer"] = requestHandlers.notify;
 
 function start(port) {
   function onRequest(request, response) {
     var pathname = url.parse(request.url).pathname;
     console.log("Receive request for " + pathname);
 
-    response.writeHead(200, {"Content-Type": "text/plain"});
-
     if (typeof handle[pathname] === 'function') {
-      response.write(handle[pathname]());
+      handle[pathname](response);
+      response.end();
     } else {
       console.log("No request handle found for " + pathname);
-      response.write("Hello, world");
+      response.writeHead(404, {"Content-Type": "text/plain"});
+      response.write("404 Not found");
+      response.end();
     }
-
-    response.end();
 
   }
 
